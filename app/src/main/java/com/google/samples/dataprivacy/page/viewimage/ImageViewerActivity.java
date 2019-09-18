@@ -29,6 +29,7 @@ import com.google.samples.dataprivacy.Injection;
 import com.google.samples.dataprivacy.R;
 
 import java.io.File;
+import java.net.URI;
 
 public class ImageViewerActivity extends AppCompatActivity implements ImageSharer {
 
@@ -63,6 +64,24 @@ public class ImageViewerActivity extends AppCompatActivity implements ImageShare
      */
     @Override
     public void shareImage(String path) {
-        Toast.makeText(this, "TODO: implement sharing.", Toast.LENGTH_SHORT).show();
+        // generate a shareable URI for the given file (contentUri).
+        // The path parameter in the method contains the absolute path to an image stored in the app.
+        Uri contentUri = FileProvider.getUriForFile(this,
+                "com.google.samples.dataprivacy.FileProvider", new File(path));
+
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+
+        // Set the contentUri as data, and the data type as "image/png".
+        // This allows receiving apps to interpret the data correctly.
+        intent.setDataAndType(contentUri, "image/png");
+
+        // Grant the receiving app read access to this content URI by using
+        // Intent.FLAG_GRANT_READ_URI_PERMISSION.
+        // This flag tells the FileProvider to make the file available only to the recipient of this intent.
+        // If you do not specify this flag, the app that receives this intent will not be able to
+        // open the URI or access the referenced file.
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(intent);
     }
 }
